@@ -89,7 +89,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM IParam)
 	{
 	case WM_CREATE:
 
-	    KhinstDll = LoadLibrary(TEXT("DllProject.dll"));
+	    KhinstDll = LoadLibrary(TEXT("KeyHookDll.dll"));
 
 		if (KhinstDll == NULL)
 		{
