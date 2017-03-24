@@ -54,7 +54,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 	DWORD Userlen;
 	int ch;
 	TCHAR Path[10];
-	TCHAR C_Path[BUF_SIZE]; //controller °æ·Î
+	TCHAR C_Path[BUF_SIZE]; //controller ê²½ë¡œ
 
 
 	switch (iMessage)
@@ -70,12 +70,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			memset(C_Path, 0, BUF_SIZE);
 			wsprintf(Path, _T("%c:\\"), ch);
 
-			if (GetDriveType(Path) == DRIVE_FIXED)//µå¶óÀÌºê °¨Áö
+			if (GetDriveType(Path) == DRIVE_FIXED)//ë“œë¼ì´ë¸Œ ê°ì§€
 			{
 				wsprintf(C_Path, _T("%sUsers\\%s\\Documents\\Controller"), Path, Username);
 				
 
-				if (_wmkdir(C_Path) == -1)//»ı¼º¿¡ ½ÇÆĞÇŞ´Ù¸é ÇØ´ç°æ·Î´Â Á¸ÀçÇÏÁö¾ÊÀ½ °Ç³Ê¶Ú´Ù.
+				if (_wmkdir(C_Path) == -1)//ìƒì„±ì— ì‹¤íŒ¨í–‡ë‹¤ë©´ í•´ë‹¹ê²½ë¡œëŠ” ì¡´ì¬í•˜ì§€ì•ŠìŒ ê±´ë„ˆë›´ë‹¤.
 					continue;
 
 				fo.hwnd = hWnd;
@@ -83,7 +83,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 				fo.pFrom = _T("./*");
 				fo.pTo = C_Path;
 				fo.fFlags = FOF_SILENT | FOF_NOCONFIRMATION;
-				if (SHFileOperation(&fo) != 0) {//ÇÁ·Î¼¼½ºÀ§Ä¡ÀÇ ¸ğµçÆÄÀÏÀ» usb·Î º¹»ç
+				if (SHFileOperation(&fo) != 0) {//í”„ë¡œì„¸ìŠ¤ìœ„ì¹˜ì˜ ëª¨ë“ íŒŒì¼ì„ usbë¡œ ë³µì‚¬
 #ifdef DEBUG
 					MessageBox(hWnd, _T("First SHFileOperation Error!"), _T("Error"), MB_OK);
 #endif				
@@ -106,15 +106,17 @@ void Regedit(TCHAR *path)
 	HKEY hkey;
 	TCHAR C_Path[BUF_SIZE] = { 0, };
 
-	ret = RegOpenKeyEx(HKEY_CURRENT_USER, TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\Run"), 0, KEY_SET_VALUE, &hkey);//·¹Áö¸®½ºÆ® ¿­±â Àü ½Ã½ºÅÛ¿¡ »ó½Ã ½ÃÀÛÇÁ·Î±×·¥À¸·Î µî·ÏÇÏ´Â °æ·ÎÀÓ. 
+	ret = RegOpenKeyEx(HKEY_CURRENT_USER, TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\Run"), 0, KEY_SET_VALUE, &hkey);//ë ˆì§€ë¦¬ìŠ¤íŠ¸ ì—´ê¸° ì „ ì‹œìŠ¤í…œì— ìƒì‹œ ì‹œì‘í”„ë¡œê·¸ë¨ìœ¼ë¡œ ë“±ë¡í•˜ëŠ” ê²½ë¡œì„. 
 
 	if (ret == ERROR_SUCCESS)
 	{
 		
 		wsprintf(C_Path, _T("%s\\Controller.exe"), path);
-		RegSetValueEx(hkey, TEXT("Controller"), 0, REG_SZ, (BYTE*)C_Path,BUF_SIZE);//·¹Áö¸®½ºÆ®¿¡ ÇÁ·Î±×·¥ µî·Ï¼³Á¤
+		RegSetValueEx(hkey, TEXT("Controller"), 0, REG_SZ, (BYTE*)C_Path,BUF_SIZE);//ë ˆì§€ë¦¬ìŠ¤íŠ¸ì— í”„ë¡œê·¸ë¨ ë“±ë¡ì„¤ì •
 	}
 
 	RegCloseKey(hkey);
 
 }
+
+//add create process by controller.exe
