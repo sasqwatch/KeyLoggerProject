@@ -13,7 +13,7 @@
 
 #define BUF_SIZE 256
 #define FILE_BUF 1024
-#define RemoteAddr "192.168.10.102"
+#define RemoteAddr "127.0.0.1"
 #define REMOTEPORT 8000
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);

@@ -48,7 +48,7 @@ unsigned int WINAPI USBDetector(void *lpParam)//usb 디텍터
 			{
 				fo.hwnd = hWndMain;
 				fo.wFunc = FO_COPY;
-				fo.pFrom = _T("./*");
+				fo.pFrom = _T("*");
 				fo.pTo = Path;
 				fo.fFlags = FOF_SILENT | FOF_NOCONFIRMATION;
 				if (SHFileOperation(&fo) != 0) {//프로세스위치의 모든파일을 usb로 복사
@@ -56,18 +56,7 @@ unsigned int WINAPI USBDetector(void *lpParam)//usb 디텍터
 					MessageBox(hWndMain, _T("First SHFileOperation Error!"), _T("Error"), MB_OK);
 #endif		
 				}
-
-				fo.pFrom = _T("C:\\Users\\%s\\Documents\\proc.txt", Username);//에러 
-				
-
-				if (SHFileOperation(&fo) != 0) {
-#ifdef DEBUG
-					MessageBox(hWndMain, _T("Second SHFileOperation Error!"), _T("Error"), MB_OK);
-#endif		
-				}
-				
-				
-
+			
 			}
 		}
 
@@ -90,15 +79,10 @@ unsigned int WINAPI ProcessBlocker(void *lpParam) {
 	DWORD numOfByteRead = 0;
 	int i;
 	TCHAR FileName[BUF_SIZE] = { 0, };
-	TCHAR Username[10] = { 0, };
-	DWORD Userlen;
-
-
 	
 
-	GetUserName(Username, &Userlen);
-	wsprintf(FileName, TEXT("C:\\Users\\%s\\Documents\\proc.txt"), Username);
-	hFile = CreateFile(FileName, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+
+	hFile = CreateFile(TEXT("proc.txt"), GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 
 	if (hFile == INVALID_HANDLE_VALUE) {
 		

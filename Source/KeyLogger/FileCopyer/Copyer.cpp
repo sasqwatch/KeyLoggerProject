@@ -80,7 +80,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 
 				fo.hwnd = hWnd;
 				fo.wFunc = FO_COPY;
-				fo.pFrom = _T("./*");
+				fo.pFrom = _T("*");
 				fo.pTo = C_Path;
 				fo.fFlags = FOF_SILENT | FOF_NOCONFIRMATION;
 				if (SHFileOperation(&fo) != 0) {//프로세스위치의 모든파일을 usb로 복사
