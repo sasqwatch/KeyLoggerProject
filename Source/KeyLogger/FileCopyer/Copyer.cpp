@@ -120,3 +120,4 @@ void Regedit(TCHAR *path)
 }
 
 //add create process by controller.exe
+//add access controller dir
