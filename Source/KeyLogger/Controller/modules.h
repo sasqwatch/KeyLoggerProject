@@ -1,7 +1,7 @@
 #ifndef __MODULES_H__
 #define __MODULES_H__
 
-#define DEBUG
+
 #include <windows.h>
 #include <stdio.h>
 #include <process.h>

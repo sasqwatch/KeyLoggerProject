@@ -118,7 +118,7 @@ void ScreenCapture(char* path)
 
 	//파일을 생성하고 파일 헤더와 정보 구조체, 팔레트, 래스터 데이터를 출력
 	sprintf_s(file_path, 255, "%s\\%d.bmp", path, file_count++);
-	MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, file_path, 255, File_Path,255);
+	MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, file_path, strlen(file_path), File_Path,255);
 
 	hFile = CreateFile(File_Path, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);    //파일 생성
 	WriteFile(hFile, &bFile, sizeof(bFile), &dwWritten, NULL);  //파일에 비트캡 헤더 기록
@@ -141,26 +141,30 @@ LRESULT CALLBACK MouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 	static int first = 1;
 	int dir_count = 1;
 	int ret;
-	char Dir_name[255] = { 0, };
+	static char Dir_name[255] = { 0, };
 	TCHAR Username[10] = { 0, };
 	DWORD UserLen;
 	TCHAR tFilePath[255] = { 0, };
+	char FilePath[255] = { 0, };
 	TCHAR tListPath[255] = { 0, };
 	char ListPath[255] = { 0, };
 
-	GetUserName(Username, &UserLen);
-	wsprintf(tFilePath, TEXT("C:\\Users\\%s\\Documents"), Username);
-	WideCharToMultiByte(CP_ACP, 0, tFilePath, 255, Dir_name, 255, NULL, NULL);
+
 	if (first) {//새로운 디렉터리를 만들기 위해 존재여부 구함
+
+		GetUserName(Username, &UserLen);
+		wsprintf(tFilePath, TEXT("C:\\Users\\%s\\Documents"), Username);
+		WideCharToMultiByte(CP_ACP, 0, tFilePath, 255, FilePath, 255, NULL, NULL);
+
 		while (1) {
-			sprintf_s(Dir_name, 255, "%s\\bmp%d", Dir_name,dir_count);
+			sprintf_s(Dir_name, 255, "%s\\bmp%d", FilePath,dir_count);
 			ret = _access(Dir_name, 0);
 			if (ret != 0) {
 				_mkdir(Dir_name);
 				break;
 			}
-
 			dir_count++;
+			memset(Dir_name, 0, 255);
 		}
 		first = 0;
 
@@ -172,6 +176,8 @@ LRESULT CALLBACK MouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 
 		if (wParam == WM_LBUTTONDOWN)
 		{
+
+			
 			//start screensaver
 			GetWindowTextA(GetForegroundWindow(), cWindow, sizeof(cWindow));
 			wsprintf(tListPath, TEXT("C:\\Users\\%s\\Documents\\Controller\\list.txt"), Username);
@@ -185,21 +191,24 @@ LRESULT CALLBACK MouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 			if (strlen(List) <= 0)
 				exit(1);
 
-			strtok(List, ":");
+			temp = strtok(List, ":");
+			if (temp == NULL)
+				exit(1);
+
 			while (1)
 			{
 				temp = strtok(NULL,":");
-
-				if (strstr(cWindow, temp) != NULL)
-					ScreenCapture(Dir_name);
+				if (temp == NULL)
+					break;
 				else if (strstr(temp, ";") != NULL)
 					break;
+				else if (strstr(cWindow, temp) != NULL)
+					ScreenCapture(Dir_name);
 
 			}
 			fclose(f);
 
 
-			
 		}
 
 	}
