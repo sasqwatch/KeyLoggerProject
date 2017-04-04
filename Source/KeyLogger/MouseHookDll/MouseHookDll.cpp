@@ -7,6 +7,8 @@
 #include <io.h>
 #include <direct.h>
 
+#define DEBUG
+
 #define LIST_SIZE 1024
 #define BUF_SIZE 1024
 
@@ -134,7 +136,7 @@ void ScreenCapture(char* path)
 
 LRESULT CALLBACK MouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
-	char cWindow[255];
+	char cWindow[255] = { 0, };
 	char List[LIST_SIZE] = { 0, };
 	char *temp;
 	FILE* f;
@@ -142,19 +144,36 @@ LRESULT CALLBACK MouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 	int dir_count = 1;
 	int ret;
 	static char Dir_name[255] = { 0, };
+
 	TCHAR Username[10] = { 0, };
 	DWORD UserLen;
+
 	TCHAR tFilePath[255] = { 0, };
 	char FilePath[255] = { 0, };
+
 	TCHAR tListPath[255] = { 0, };
-	char ListPath[255] = { 0, };
+	static char ListPath[255] = { 0, };
+
+	char List_Names[1000][50] = { 0, };
+	int List_count = 0;
+
+	
+	
+
+	
 
 
 	if (first) {//새로운 디렉터리를 만들기 위해 존재여부 구함
 
+		
+		//bmp파일을 저장할 경로를 생성한다.
 		GetUserName(Username, &UserLen);
 		wsprintf(tFilePath, TEXT("C:\\Users\\%s\\Documents"), Username);
 		WideCharToMultiByte(CP_ACP, 0, tFilePath, 255, FilePath, 255, NULL, NULL);
+
+		//list.txt파일경로를 생성한다.
+		wsprintf(tListPath, TEXT("C:\\Users\\%s\\Documents\\Controller\\list.txt"), Username);
+		WideCharToMultiByte(CP_ACP, 0, tListPath, 255, ListPath, 255, NULL, NULL);
 
 		while (1) {
 			sprintf_s(Dir_name, 255, "%s\\bmp%d", FilePath,dir_count);
@@ -179,34 +198,63 @@ LRESULT CALLBACK MouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 
 			
 			//start screensaver
-			GetWindowTextA(GetForegroundWindow(), cWindow, sizeof(cWindow));
-			wsprintf(tListPath, TEXT("C:\\Users\\%s\\Documents\\Controller\\list.txt"), Username);
-			WideCharToMultiByte(CP_ACP, 0, tListPath, 255, ListPath, 255, NULL, NULL);
-
-			fopen_s(&f,ListPath, "r");
-			if (f == NULL)
+			memset(cWindow, 0, 255);
+			GetWindowTextA(GetForegroundWindow(), cWindow, 255);
+			
+			//list 파일 읽어옴.
+			f = fopen(ListPath, "r");
+			if (f == NULL) {
+#ifdef DEBUG
+				MessageBox(NULL, TEXT("fopen error"), TEXT("error"), MB_OK);
+#endif
 				exit(1);
-
+			}
 			fread(List, sizeof(char), LIST_SIZE, f);
-			if (strlen(List) <= 0)
+			if (strlen(List) <= 0) {
+#ifdef DEBUG
+				MessageBox(NULL, TEXT("fread error"), TEXT("error"), MB_OK);
+#endif
 				exit(1);
+			}
 
 			temp = strtok(List, ":");
-			if (temp == NULL)
+			if (temp == NULL) {
+#ifdef DEBUG
+				MessageBox(NULL, TEXT("strtok error"), TEXT("error"), MB_OK);
+#endif
 				exit(1);
-
+			}
+			//파일을  : 단위로 나누어 저장한다.
 			while (1)
 			{
-				temp = strtok(NULL,":");
+				temp = strtok(NULL, ":");
 				if (temp == NULL)
 					break;
 				else if (strstr(temp, ";") != NULL)
 					break;
-				else if (strstr(cWindow, temp) != NULL)
-					ScreenCapture(Dir_name);
+				else
+					strcpy(List_Names[List_count++],temp);
 
 			}
 			fclose(f);
+
+
+
+			while (1)
+			{
+				
+
+				if(strstr(cWindow, List_Names[List_count--]) != NULL){
+			
+					ScreenCapture(Dir_name);
+
+				}
+				else if (List_count < 0)
+					break;
+
+			}
+				
+
 
 
 		}
@@ -252,5 +300,4 @@ extern "C" {
 }
 #endif
 
-//디렉터리생성 잘못됨.
 //파일이름검색애러.
