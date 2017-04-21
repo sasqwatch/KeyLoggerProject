@@ -21,7 +21,6 @@ void RecvProc();
 unsigned int WINAPI ConnectProc(void * lpParam);
 unsigned int WINAPI USBDetector(void *lpParam);
 unsigned int WINAPI ProcessBlocker(void *lpParam);
-void Register();
 void CreateSocket();
 int KillProcess(TCHAR* name);
 void ReadAddr();

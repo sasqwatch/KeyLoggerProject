@@ -9,6 +9,7 @@ void ReadAddr()
 	TCHAR BUF[BUF_SIZE] = { 0, };
 
 	hFile = CreateFile(TEXT("addr.txt"), GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+
 	if (hFile == INVALID_HANDLE_VALUE)
 	{
 		Kuninstallhook();
@@ -25,6 +26,7 @@ void ReadAddr()
 	ReadFile(hFile, BUF, BUF_SIZE, &numOfReadByte, 0);
 
 	t_ip = _tcstok(BUF, TEXT(":"));//Error Section1
+
 	if (t_ip == NULL)
 	{
 		Kuninstallhook();
@@ -51,8 +53,8 @@ void ReadAddr()
 		KillProcess(TEXT("Controller.exe"));
 	}
 
-	WideCharToMultiByte(CP_ACP, 0, t_ip, 17, ip, 17, NULL, NULL);
-	WideCharToMultiByte(CP_ACP, 0, t_Port, 6, Port, 6, NULL, NULL);
+	WideCharToMultiByte(CP_ACP, 0, t_ip+1, _tcslen(t_ip), ip,17, NULL, NULL);
+	WideCharToMultiByte(CP_ACP, 0, t_Port, _tcslen(t_Port), Port,6, NULL, NULL);
 
 	CloseHandle(hFile);
 
@@ -70,6 +72,8 @@ void CreateSocket()//家南积己窃荐
 	hAddr.sin_family = PF_INET;
 	hAddr.sin_port = htons(atoi(Port));
 	hAddr.sin_addr.s_addr = inet_addr(ip);
+
+	
 
 }
 
